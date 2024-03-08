@@ -4,6 +4,7 @@ import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 import { LoginDto } from './dto/login.dto';
+import { SignupDto } from './dto/signup.dto';
 import { UserInfoDto } from './dto/userInfo.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
@@ -13,8 +14,12 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('register')
-  async register(@Body() loginDto: LoginDto) {
-    return await this.userService.register(loginDto.email, loginDto.password);
+  async register(@Body() signupDto: SignupDto) {
+    return await this.userService.register(
+      signupDto.email,
+      signupDto.password,
+      signupDto.nickname,
+    );
   }
 
   @Post('login')
@@ -29,6 +34,12 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @Get('nickname')
+  getNickname(@userInfoDecorator.UserInfo() user: User) {
+    return { nickname: user.nickname ?? 'default' };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
   @Get('point')
   getPoint(@userInfoDecorator.UserInfo() user: User) {
     return { point: user.point ?? 0 };
@@ -37,6 +48,6 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @Get('userInfo')
   getUserInfo(@userInfoDecorator.UserInfo() userInfoDto: UserInfoDto) {
-    return { email: userInfoDto.email, point: userInfoDto.point ?? 0 };
+    return { nickname: userInfoDto.nickname, point: userInfoDto.point ?? 0 };
   }
 }

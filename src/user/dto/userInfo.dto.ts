@@ -9,7 +9,10 @@ export class UserInfoDto {
   email: string;
 
   @Expose()
-  userName: string;
+  userName: string; // ?
+
+  @Expose()
+  nickname: string;
 
   @Exclude()
   password: string;

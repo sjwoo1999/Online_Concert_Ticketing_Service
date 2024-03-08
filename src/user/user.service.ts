@@ -20,7 +20,7 @@ export class UserService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(email: string, password: string) {
+  async register(email: string, password: string, nickname: string) {
     const existingUser = await this.findByEmail(email);
     if (existingUser) {
       throw new ConflictException(
@@ -32,12 +32,13 @@ export class UserService {
     await this.userRepository.save({
       email,
       password: hashedPassword,
+      nickname,
     });
   }
 
   async login(email: string, password: string) {
     const user = await this.userRepository.findOne({
-      select: ['id', 'email', 'password', 'point'],
+      select: ['id', 'email', 'password', 'nickname', 'point'],
       where: { email },
     });
     if (_.isNil(user)) {
@@ -61,6 +62,11 @@ export class UserService {
       await this.userRepository.save(user);
     }
 
+    // nickname 값 존재 여부 검사
+    if (!user.nickname) {
+      throw new UnauthorizedException('사용자 닉네임 정보가 없습니다.');
+    }
+
     const payload = { email, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
@@ -71,13 +77,18 @@ export class UserService {
     return await this.userRepository.findOneBy({ email });
   }
 
+  async findByNickname(nickname: string) {
+    return await this.userRepository.findOneBy({ nickname });
+  }
+
   async getPoint(
     email: string,
     password: string,
+    nickname: string,
     point: number,
   ): Promise<User> {
     const user = await this.userRepository.findOne({
-      select: ['email', 'password', 'point'],
+      select: ['email', 'password', 'nickname', 'point'],
       where: { point },
     });
 
@@ -95,10 +106,11 @@ export class UserService {
   async getUserInfo(
     email: string,
     password: string,
+    nickname: string,
     point: number,
   ): Promise<User[]> {
     const user = await this.userRepository.findOne({
-      select: ['email', 'password', 'point'],
+      select: ['email', 'password', 'nickname', 'point'],
       where: { email, point },
     });
 

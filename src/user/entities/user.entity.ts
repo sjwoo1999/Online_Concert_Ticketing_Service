@@ -22,6 +22,14 @@ export class User {
   @Column({ type: 'varchar', select: false, nullable: false })
   password: string;
 
+  @Column({
+    type: 'varchar',
+    unique: true,
+    nullable: false,
+    default: 'nickname',
+  })
+  nickname: string;
+
   @Column({ type: 'enum', enum: Role, default: Role.User })
   role: Role;
 
