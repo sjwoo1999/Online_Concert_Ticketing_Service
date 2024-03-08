@@ -29,10 +29,12 @@ export class UserService {
     }
 
     const hashedPassword = await hash(password, 10);
+
     await this.userRepository.save({
       email,
       password: hashedPassword,
       nickname,
+      point: 1000000,
     });
   }
 
@@ -57,9 +59,6 @@ export class UserService {
       }
 
       console.log('포인트 값이 유효합니다~');
-
-      user.point = user.point + 100;
-      await this.userRepository.save(user);
     }
 
     // nickname 값 존재 여부 검사
