@@ -1,13 +1,14 @@
-import { IsString } from 'class-validator';
 import {
   Column,
-  CreateDateColumn,
-  DeleteDateColumn,
   Entity,
+  Index,
+  OneToMany,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 
+import { Role } from '../types/userRole.type';
+
+@Index('email', ['email'], { unique: true })
 @Entity({
   name: 'users',
 })
@@ -15,20 +16,15 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @IsString()
-  @Column('varchar', { length: 10, nullable: false })
-  userId: string;
+  @Column({ type: 'varchar', unique: true, nullable: false })
+  email: string;
 
-  @IsString()
-  @Column('varchar', { length: 10, select: false, nullable: false })
+  @Column({ type: 'varchar', select: false, nullable: false })
   password: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @Column({ type: 'enum', enum: Role, default: Role.User })
+  role: Role;
 
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @DeleteDateColumn()
-  deletedAt?: Date;
+  @Column({ type: 'int', default: 0 })
+  point: number;
 }
