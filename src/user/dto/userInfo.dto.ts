@@ -19,4 +19,7 @@ export class UserInfoDto {
 
   @Expose()
   point: number;
+
+  @Expose()
+  role: string;
 }

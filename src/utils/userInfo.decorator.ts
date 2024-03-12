@@ -6,3 +6,10 @@ export const UserInfo = createParamDecorator(
     return request.user ? request.user : null;
   },
 );
+export function UserInfoDto(): (
+  target: import('../user/user.controller').UserController,
+  propertyKey: 'getUserInfo',
+  parameterIndex: 0,
+) => void {
+  throw new Error('Function not implemented.');
+}

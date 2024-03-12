@@ -12,4 +12,8 @@ export class SignupDto {
   @IsString()
   @IsNotEmpty({ message: '닉네임을 입력해주세요.' })
   nickname: string;
+
+  @IsString()
+  @IsNotEmpty({ message: '역할을 입력해주세요.' })
+  role: string;
 }

@@ -19,6 +19,7 @@ export class UserController {
       signupDto.email,
       signupDto.password,
       signupDto.nickname,
+      signupDto.role,
     );
   }
 
@@ -48,6 +49,10 @@ export class UserController {
   @UseGuards(AuthGuard('jwt'))
   @Get('userInfo')
   getUserInfo(@userInfoDecorator.UserInfo() userInfoDto: UserInfoDto) {
-    return { nickname: userInfoDto.nickname, point: userInfoDto.point ?? 0 };
+    return {
+      nickname: userInfoDto.nickname,
+      point: userInfoDto.point ?? 0,
+      role: userInfoDto.role,
+    };
   }
 }

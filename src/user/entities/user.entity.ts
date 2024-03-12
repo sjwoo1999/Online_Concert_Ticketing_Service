@@ -30,8 +30,8 @@ export class User {
   })
   nickname: string;
 
-  @Column({ type: 'enum', enum: Role, default: Role.User })
-  role: Role;
+  @Column({ type: 'varchar', nullable: false, default: 'User' })
+  role: string;
 
   @Column({ type: 'int', default: 0 })
   point: number;

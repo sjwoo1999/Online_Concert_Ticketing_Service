@@ -11,6 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { User } from './entities/user.entity';
+// import { Role } from './types/userRole.type';
 
 @Injectable()
 export class UserService {
@@ -20,7 +21,12 @@ export class UserService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(email: string, password: string, nickname: string) {
+  async register(
+    email: string,
+    password: string,
+    nickname: string,
+    role: string,
+  ) {
     const existingUser = await this.findByEmail(email);
     if (existingUser) {
       throw new ConflictException(
@@ -35,6 +41,7 @@ export class UserService {
       password: hashedPassword,
       nickname,
       point: 1000000,
+      role,
     });
   }
 
@@ -107,9 +114,10 @@ export class UserService {
     password: string,
     nickname: string,
     point: number,
+    role: string,
   ): Promise<User[]> {
     const user = await this.userRepository.findOne({
-      select: ['email', 'password', 'nickname', 'point'],
+      select: ['email', 'password', 'nickname', 'point', 'role'],
       where: { email, point },
     });
 
