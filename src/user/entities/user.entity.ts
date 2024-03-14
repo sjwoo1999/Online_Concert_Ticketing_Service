@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 
 import { Role } from '../types/userRole.type';
+import { Concert } from 'src/concert/entities/concert.entity';
 
 @Index('email', ['email'], { unique: true })
 @Entity({
@@ -24,15 +25,13 @@ export class User {
 
   @Column({
     type: 'varchar',
-    unique: true,
     nullable: false,
-    default: 'nickname',
   })
   nickname: string;
 
-  @Column({ type: 'varchar', nullable: false, default: 'User' })
-  role: string;
+  @Column({ type: 'enum', enum: Role, default: Role.User })
+  role: Role;
 
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'int', default: 1000000, nullable: false })
   point: number;
 }

@@ -10,6 +10,8 @@ import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
 import { Concert } from './concert/entities/concert.entity';
 import { ConcertModule } from './concert/concert.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 const typeOrmModuleOptions = {
   useFactory: async (
@@ -48,7 +50,7 @@ const typeOrmModuleOptions = {
     UserModule,
     ConcertModule,
   ],
-  controllers: [],
-  providers: [],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

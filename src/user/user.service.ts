@@ -6,26 +6,33 @@ import {
   ConflictException,
   Injectable,
   UnauthorizedException,
+  BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { User } from './entities/user.entity';
-// import { Role } from './types/userRole.type';
+import { Concert } from '../concert/entities/concert.entity';
+import { Role } from './types/userRole.type';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Concert)
+    private concertRepository: Repository<Concert>,
     private readonly jwtService: JwtService,
   ) {}
 
   async register(
     email: string,
     password: string,
+    confirmPassword: string,
     nickname: string,
-    role: string,
+    role: Role,
+    point: number,
   ) {
     const existingUser = await this.findByEmail(email);
     if (existingUser) {
@@ -40,14 +47,20 @@ export class UserService {
       email,
       password: hashedPassword,
       nickname,
-      point: 1000000,
       role,
+      point,
     });
+
+    return {
+      message: '회원가입에 성공했습니다.',
+      success: true,
+      data: { email, nickname, role, point },
+    };
   }
 
   async login(email: string, password: string) {
     const user = await this.userRepository.findOne({
-      select: ['id', 'email', 'password', 'nickname', 'point'],
+      select: ['id', 'email', 'password'],
       where: { email },
     });
     if (_.isNil(user)) {
@@ -73,9 +86,13 @@ export class UserService {
       throw new UnauthorizedException('사용자 닉네임 정보가 없습니다.');
     }
 
+    console.log('사용자 닉네임 정보가 존재합니다~');
+
     const payload = { email, sub: user.id };
     return {
-      access_token: this.jwtService.sign(payload),
+      message: '로그인에 성공했습니다.',
+      success: true,
+      data: { access_token: this.jwtService.sign(payload) },
     };
   }
 
@@ -87,48 +104,18 @@ export class UserService {
     return await this.userRepository.findOneBy({ nickname });
   }
 
-  async getPoint(
-    email: string,
-    password: string,
-    nickname: string,
-    point: number,
-  ): Promise<User> {
-    const user = await this.userRepository.findOne({
-      select: ['email', 'password', 'nickname', 'point'],
-      where: { point },
-    });
-
-    if (_.isNil(user)) {
-      throw new UnauthorizedException('이메일을 확인해주세요.');
-    }
-
-    if (!(await compare(password, user.password))) {
-      throw new UnauthorizedException('비밀번호를 확인해주세요.');
-    }
-
-    return user;
+  async getPoint(point: number) {
+    return await this.userRepository.findOneBy({ point });
   }
 
-  async getUserInfo(
-    email: string,
-    password: string,
-    nickname: string,
-    point: number,
-    role: string,
-  ): Promise<User[]> {
+  async getUserInfo(userId: number) {
     const user = await this.userRepository.findOne({
-      select: ['email', 'password', 'nickname', 'point', 'role'],
-      where: { email, point },
+      select: ['email', 'nickname', 'point'],
+      where: { id: userId },
     });
 
     if (_.isNil(user)) {
-      throw new UnauthorizedException('이메일을 확인해주세요.');
+      throw new NotFoundException('사용자 정보가 없습니다');
     }
-
-    if (!(await compare(password, user.password))) {
-      throw new UnauthorizedException('비밀번호를 확인해주세요.');
-    }
-
-    return [user];
   }
 }

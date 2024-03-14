@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
 import { JwtStrategy } from './jwt.strategy';
+import { ConcertModule } from 'src/concert/concert.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { JwtStrategy } from './jwt.strategy';
       }),
       inject: [ConfigService],
     }),
-    UserModule, // 추가!
+    UserModule,
+    ConcertModule,
   ],
   providers: [JwtStrategy],
 })

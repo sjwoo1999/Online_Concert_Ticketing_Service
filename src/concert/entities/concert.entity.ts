@@ -1,5 +1,4 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Role } from '../../user/types/userRole.type';
 
 @Entity({
   name: 'concerts',
@@ -17,9 +16,18 @@ export class Concert {
   })
   concertname: string;
 
+  // detail
+  @Column({
+    type: 'varchar',
+    select: false,
+    nullable: false,
+  })
+  concertDetail: string;
+
   // maxReservation
   @Column({
     type: 'int',
+    nullable: false,
     default: 0,
   })
   maxreservation: number;
@@ -27,23 +35,12 @@ export class Concert {
   // currentReservation
   @Column({
     type: 'int',
+    nullable: false,
     default: 0,
   })
   currentreservation: number;
 
   // date
-  @Column({ type: 'date' })
-  date: Date;
-
-  // time
-  @Column({ type: 'time' })
-  // time: Time;
-
-  // detail
-  @Column({
-    type: 'varchar',
-    // select: false, - 천천히 생각해봐야 할 듯
-    default: 'detail',
-  })
-  detail: string;
+  @Column({ type: 'varchar' })
+  concertSchedule: string;
 }
