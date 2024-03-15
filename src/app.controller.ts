@@ -1,14 +1,11 @@
-import { Controller, Get, Render } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Get } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Common')
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
-
-  @Get()
-  @Render('index')
-  getHello() {
-    //return this.appService.getHello();
-    return { message: 'Hello NestJS!' };
+  @Get('/health-check')
+  healthCheck(): string {
+    return 'This server is healthy';
   }
 }

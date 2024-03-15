@@ -1,40 +1,36 @@
-import { UserInfo } from 'src/utils/userInfo.decorator';
-import { RolesGuard } from 'src/auth/roles.guard';
-
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
-
-import { LoginDto } from './dto/login.dto';
-import { SignupDto } from './dto/signup.dto';
-import { UpdateUserInfoDto } from './dto/updateUserInfo.dto';
-
-import { User } from './entities/user.entity';
+import {
+  Controller,
+  Get,
+  HttpStatus,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
+@ApiTags('사용자')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('register')
-  async register(@Body() signupDto: SignupDto) {
-    return await this.userService.register(
-      signupDto.email,
-      signupDto.password,
-      signupDto.confirmPassword,
-      signupDto.nickname,
-      signupDto.role,
-      signupDto.point,
-    );
-  }
+  /**
+   * 내 정보 조회
+   * @param req
+   * @returns
+   */
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('/me')
+  async findMe(@Request() req) {
+    const userId = req.user.id;
 
-  @Post('login')
-  async login(@Body() loginDto: LoginDto) {
-    return await this.userService.login(loginDto.email, loginDto.password);
-  }
+    const data = await this.userService.findOneById(userId);
 
-  @UseGuards(RolesGuard)
-  @Get('userInfo')
-  async getUserInfo(@UserInfo() user: User) {
-    return await this.userService.getUserInfo(user.id);
+    return {
+      statusCode: HttpStatus.OK,
+      message: '내 정보 조회에 성공했습니다.',
+      data,
+    };
   }
 }
